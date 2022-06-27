@@ -1,3 +1,4 @@
+mod cli;
 fn main() {
-    println!("Hello, world!");
+    let matches = cli::build_cli().get_matches();
 }
