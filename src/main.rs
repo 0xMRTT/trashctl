@@ -1,8 +1,6 @@
 
-use clap::{Command, AppSettings,App, Arg, ValueHint, value_parser, ColorChoice};
-use clap_complete::{generate, Generator, Shell};
-use std::io;
-use std::process::exit;
+use clap::{AppSettings,App, Arg};
+use clap_complete::Shell;
 
 use anyhow::anyhow;
 mod cmd;
