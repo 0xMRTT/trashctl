@@ -1,7 +1,7 @@
 use clap::{arg, App, Arg, ArgMatches};
 
 pub fn make_subcommand<'help>() -> App<'help> {
-    App::new("restore")
+    App::new("put")
         .about("Put a file or a directory in the trash")
         .arg(arg!(--force "Skips confirmation prompts"))
         .arg(
