@@ -12,3 +12,7 @@ pub fn make_subcommand<'help>() -> App<'help> {
                 .required(false),
         )
 }
+
+pub fn execute(args: &ArgMatches) -> Result<(), ()> {
+    Ok(())
+}
