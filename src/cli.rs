@@ -1,15 +1,23 @@
 
-use clap::{Command, AppSettings, Arg, ValueHint, value_parser};
+use clap::{Command, AppSettings, Arg, ValueHint, value_parser, ColorChoice};
 use clap_complete::{generate, Generator, Shell};
 use std::io;
 use std::process::exit;
 
 pub fn build_cli() -> Command<'static> {
-    Command::new("example")
-         .arg(Arg::new("file")
-             .help("some input file")
-                .value_hint(ValueHint::AnyPath),
-        )
+    Command::new("crs")
+    .author("0xMRTT")
+    .about("Trash management tool written in Rust")
+    .version("0.1.0")
+    .color(ColorChoice::Auto)
+    .name("Trashctl")
+    .long_about("Trash management tool written in Rust
+               
+This tool is used to manage trash files in your system.
+It is useful to clean up your system trash files.
+It is also useful to manage your trash files in a centralized way.
+
+https://github.com/0xMRTT/trashctl")
     .arg(
         Arg::new("completion")
         .long("completion")
