@@ -5,3 +5,7 @@ pub fn make_subcommand<'help>() -> App<'help> {
         .about("Empty the trash")
         .arg(arg!(--force "Skips confirmation prompts"))
 }
+
+pub fn execute(args: &ArgMatches) -> Result<(), ()> {
+    Ok(())
+}
