@@ -60,9 +60,9 @@ fn main() {
         Some(("completions", sub_matches)) => (|| {
             let shell: Shell = sub_matches
                 .value_of("shell")
-                .ok_or_else(|| anyhow!("Shell name missing."))?
+                .ok_or_else(|| anyhow!("Shell name missing.")).unwrap()
                 .parse()
-                .map_err(|s| anyhow!("Invalid shell: {}", s))?;
+                .map_err(|s| anyhow!("Invalid shell: {}", s)).unwrap();
 
             let mut complete_app = create_clap_app();
             clap_complete::generate(
