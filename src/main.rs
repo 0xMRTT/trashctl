@@ -75,6 +75,7 @@ fn main() {
     };
 
     if let Err(e) = res {
+        eprintln!("{:?}", e);
         std::process::exit(101);
     }
 }
