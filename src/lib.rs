@@ -178,4 +178,29 @@ mod test {
             PathBuf::from("/run/mount/user/volume/.Trash-123")
         );
     }
+
+    #[test]
+    fn test_new_trash_info() {
+        let path = PathBuf::from("/home/user/test-need-to-go-to-trash-lol.md");
+        let deletion_date = "2022-06-28T09:40:03";
+        let trash_info = TrashInfo::new(path, deletion_date.to_string());
+        assert_eq!(
+            trash_info.path,
+            PathBuf::from("/home/user/test-need-to-go-to-trash-lol.md")
+        );
+        assert_eq!(
+            trash_info.deletion_date,
+            Utc.datetime_from_str("2022-06-28T09:40:03", "%Y-%m-%dT%H:%M:%S").unwrap()
+        );
+    }
+
+    #[test]
+    fn test_parse_date() {
+        let date = "2022-06-28T09:40:03";
+        let date_result = TrashInfo::parse_date(date.to_string());
+        assert_eq!(
+            date_result.unwrap(),
+            Utc.datetime_from_str("2022-06-28T09:40:03", "%Y-%m-%dT%H:%M:%S").unwrap()
+        );
+    }
 }
