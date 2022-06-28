@@ -59,6 +59,27 @@ pub fn home_trash_dir_path() -> PathBuf {
     trash_dir
 }
 
+/// Returns the path to the trash directory inside a volume
+/// The returned path is like `volume/.Trash/uid`.
+/// There is a related function `volume_trash_dir_2` that returns the path to the trash directory inside a volume with the form `volume/.Trash-uid/`.
+pub fn volume_trash_dir_1(volume: PathBuf, uid:u32) -> PathBuf {
+    let mut trash_dir = PathBuf::new();
+    trash_dir.push(volume);
+    trash_dir.push(".Trash");
+    trash_dir.push(format!("{}", uid));
+    trash_dir
+}
+
+/// Returns the path to the trash directory inside a volume
+/// The returned path is like `volume/.Trash-uid`.
+/// There is a related function `volume_trash_dir_1` that returns the path to the trash directory inside a volume with the form `volume/.Trash/uid/`.
+pub fn volume_trash_dir_2(volume: PathBuf, uid:u32) -> PathBuf {
+    let mut trash_dir = PathBuf::new();
+    trash_dir.push(volume);
+    trash_dir.push(format!(".Trash-{}", uid));
+    trash_dir
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -89,5 +110,21 @@ mod test {
         env::remove_var("XDG_DATA_HOME");
         let trash_dir = home_trash_dir_path_from_env();
         assert!(trash_dir.is_err());
+    }
+
+    #[test]
+    fn test_volume_trash_dir_1() {
+        let volume = PathBuf::from("/run/mount/user/volume");
+        let uid = 123;
+        let trash_dir = volume_trash_dir_1(volume, uid);
+        assert_eq!(trash_dir, PathBuf::from("/run/mount/user/volume/.Trash/123"));
+    }
+
+    #[test]
+    fn test_volume_trash_dir_2() {
+        let volume = PathBuf::from("/run/mount/user/volume");
+        let uid = 123;
+        let trash_dir = volume_trash_dir_2(volume, uid);
+        assert_eq!(trash_dir, PathBuf::from("/run/mount/user/volume/.Trash-123"));
     }
 }
