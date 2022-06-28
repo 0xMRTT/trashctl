@@ -5,30 +5,30 @@
 //! it under the terms of the GNU General Public License as published by
 //! the Free Software Foundation, either version 3 of the License, or
 //! (at your option) any later version.
-//! 
+//!
 //! This program is distributed in the hope that it will be useful,
 //! but WITHOUT ANY WARRANTY; without even the implied warranty of
 //! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //! GNU General Public License for more details.
-//! 
+//!
 //! You should have received a copy of the GNU General Public License
 //! along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //!
 //! # `trashctl` lib
-//! 
+//!
 //! This module contains the library code for trashctl.
 //! There is a lot of tools in this library, you can reuse them in your own projects.
-//! 
- 
+//!
+
+use chrono::prelude::*;
+use dirs::data_local_dir;
+use dirs::home_dir;
 use std::env;
 use std::path::PathBuf;
-use dirs::home_dir;
-use dirs::data_local_dir;
-
 
 /// Returns the path to the trash directory if XDG_DATA_HOME is set.
-/// If not, returns an error. 
-/// 
+/// If not, returns an error.
+///
 /// Do not use this function, use instead `home_trash_dir_path`.
 pub fn home_trash_dir_path_from_env() -> Result<PathBuf, ()> {
     if env::var("XDG_DATA_HOME").is_ok() {
@@ -62,7 +62,7 @@ pub fn home_trash_dir_path() -> PathBuf {
 /// Returns the path to the trash directory inside a volume
 /// The returned path is like `volume/.Trash/uid`.
 /// There is a related function `volume_trash_dir_2` that returns the path to the trash directory inside a volume with the form `volume/.Trash-uid/`.
-pub fn volume_trash_dir_1(volume: PathBuf, uid:u32) -> PathBuf {
+pub fn volume_trash_dir_1(volume: PathBuf, uid: u32) -> PathBuf {
     let mut trash_dir = PathBuf::new();
     trash_dir.push(volume);
     trash_dir.push(".Trash");
@@ -73,13 +73,55 @@ pub fn volume_trash_dir_1(volume: PathBuf, uid:u32) -> PathBuf {
 /// Returns the path to the trash directory inside a volume
 /// The returned path is like `volume/.Trash-uid`.
 /// There is a related function `volume_trash_dir_1` that returns the path to the trash directory inside a volume with the form `volume/.Trash/uid/`.
-pub fn volume_trash_dir_2(volume: PathBuf, uid:u32) -> PathBuf {
+pub fn volume_trash_dir_2(volume: PathBuf, uid: u32) -> PathBuf {
     let mut trash_dir = PathBuf::new();
     trash_dir.push(volume);
     trash_dir.push(format!(".Trash-{}", uid));
     trash_dir
 }
 
+/// Represent a `.trashinfo` file. (in `Trash/info`)
+/// The `.trashinfo` file contains the following information:
+/// - The path to the file or directory before it was moved to trash.
+/// - The time when the file or directory was moved to trash.
+///
+/// Example:
+/// ```ini
+/// [Trash Info]
+/// Path=/home/user/test-need-to-go-to-trash-lol.md
+/// DeletionDate=2022-06-28T09:40:03
+/// ```
+struct TrashInfo {
+    path: PathBuf,
+    deletion_date: DateTime<Utc>,
+}
+
+impl TrashInfo {
+    /// Parse a date with the format `YYYY-MM-DDTHH:MM:SS`
+    pub fn parse_date(date: String) -> Result<DateTime<Utc>, ()> {
+        let date = Utc.datetime_from_str(&date, "%Y-%m-%dT%H:%M:%S");
+        match date {
+            Ok(date) => {
+                return Ok(date);
+            }
+            Err(_) => {
+                return Err(());
+            }
+        }
+    }
+
+    /// Create a new TrashInfo object from a path and a date.
+    /// The date must be in the format `YYYY-MM-DDTHH:MM:SS`.
+    /// If the date is not valid, an error is returned.
+    pub fn new(path: PathBuf, deletion_date: String) -> TrashInfo {
+        // example deletion_date : 2022-06-28T09:40:03
+        let deletion_date = TrashInfo::parse_date(deletion_date).unwrap();
+        TrashInfo {
+            path,
+            deletion_date,
+        }
+    }
+}
 #[cfg(test)]
 mod test {
     use super::*;
@@ -102,7 +144,10 @@ mod test {
         xdg_data_home.push("share");
         env::set_var("XDG_DATA_HOME", xdg_data_home.clone());
         let trash_dir = home_trash_dir_path_from_env();
-        assert_eq!(trash_dir.unwrap(), PathBuf::from(xdg_data_home.clone()).join("Trash"));
+        assert_eq!(
+            trash_dir.unwrap(),
+            PathBuf::from(xdg_data_home.clone()).join("Trash")
+        );
     }
 
     #[test]
@@ -117,7 +162,10 @@ mod test {
         let volume = PathBuf::from("/run/mount/user/volume");
         let uid = 123;
         let trash_dir = volume_trash_dir_1(volume, uid);
-        assert_eq!(trash_dir, PathBuf::from("/run/mount/user/volume/.Trash/123"));
+        assert_eq!(
+            trash_dir,
+            PathBuf::from("/run/mount/user/volume/.Trash/123")
+        );
     }
 
     #[test]
@@ -125,6 +173,9 @@ mod test {
         let volume = PathBuf::from("/run/mount/user/volume");
         let uid = 123;
         let trash_dir = volume_trash_dir_2(volume, uid);
-        assert_eq!(trash_dir, PathBuf::from("/run/mount/user/volume/.Trash-123"));
+        assert_eq!(
+            trash_dir,
+            PathBuf::from("/run/mount/user/volume/.Trash-123")
+        );
     }
 }
