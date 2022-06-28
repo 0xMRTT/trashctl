@@ -4,7 +4,7 @@ use clap_complete::Shell;
 
 use anyhow::anyhow;
 mod cmd;
-pub mod trash;
+pub mod lib;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
