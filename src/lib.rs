@@ -32,4 +32,32 @@ pub fn home_trash_dir_path() -> PathBuf {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_home_trash_dir_path_with_xdg_data_home_not_set() {
+        env::remove_var("XDG_DATA_HOME");
+        let mut trash_dir = home_dir().unwrap();
+        trash_dir.push(data_local_dir().unwrap());
+        trash_dir.push("Trash");
+
+        let trash_dir_result = home_trash_dir_path();
+        assert_eq!(trash_dir, trash_dir_result);
+    }
+
+    #[test]
+    fn test_home_trash_dir_path_from_env_if_xdg_data_home_set() {
+        let mut xdg_data_home = home_dir().unwrap();
+        xdg_data_home.push(".local");
+        xdg_data_home.push("share");
+        env::set_var("XDG_DATA_HOME", xdg_data_home.clone());
+        let trash_dir = home_trash_dir_path_from_env();
+        assert_eq!(trash_dir.unwrap(), PathBuf::from(xdg_data_home.clone()).join("Trash"));
+    }
+
+    #[test]
+    fn test_home_trash_dir_path_from_env_if_xdg_data_home_not_set() {
+        env::remove_var("XDG_DATA_HOME");
+        let trash_dir = home_trash_dir_path_from_env();
+        assert!(trash_dir.is_err());
+    }
 }
