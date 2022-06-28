@@ -5,6 +5,9 @@ A command line interface for trash
 
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 [![Continuous integration](https://github.com/0xMRTT/trashctl/actions/workflows/matrix.yml/badge.svg)](https://github.com/0xMRTT/trashctl/actions/workflows/matrix.yml)
+[![Deploy](https://github.com/0xMRTT/trashctl/actions/workflows/deploy.yml/badge.svg)](https://github.com/0xMRTT/trashctl/actions/workflows/deploy.yml)
+[![Rust](https://github.com/0xMRTT/trashctl/actions/workflows/rust.yml/badge.svg)](https://github.com/0xMRTT/trashctl/actions/workflows/rust.yml)
+
 
 ## Features
 
