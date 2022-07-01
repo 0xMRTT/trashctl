@@ -25,6 +25,8 @@ use dirs::data_local_dir;
 use dirs::home_dir;
 use std::env;
 use std::path::PathBuf;
+extern crate fs_extra;
+use fs_extra::dir::move_dir;
 
 /// Returns the path to the trash directory if XDG_DATA_HOME is set.
 /// If not, returns an error.
@@ -127,6 +129,7 @@ mod test {
     use super::*;
 
     #[test]
+    /// `home_trash_dir_path` returns the path to the trash directory in the user's home directory
     fn test_home_trash_dir_path_with_xdg_data_home_not_set() {
         env::remove_var("XDG_DATA_HOME");
         let mut trash_dir = home_dir().unwrap();
@@ -190,7 +193,8 @@ mod test {
         );
         assert_eq!(
             trash_info.deletion_date,
-            Utc.datetime_from_str("2022-06-28T09:40:03", "%Y-%m-%dT%H:%M:%S").unwrap()
+            Utc.datetime_from_str("2022-06-28T09:40:03", "%Y-%m-%dT%H:%M:%S")
+                .unwrap()
         );
     }
 
@@ -200,7 +204,8 @@ mod test {
         let date_result = TrashInfo::parse_date(date.to_string());
         assert_eq!(
             date_result.unwrap(),
-            Utc.datetime_from_str("2022-06-28T09:40:03", "%Y-%m-%dT%H:%M:%S").unwrap()
+            Utc.datetime_from_str("2022-06-28T09:40:03", "%Y-%m-%dT%H:%M:%S")
+                .unwrap()
         );
     }
 }
