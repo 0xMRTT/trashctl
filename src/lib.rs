@@ -124,6 +124,20 @@ impl TrashInfo {
         }
     }
 }
+
+struct Trash {
+    files: Vec<String>,
+    info: Vec<TrashInfo>,
+}
+
+impl Trash {
+    fn new(files: Vec<String>, info: Vec<TrashInfo>) -> Trash {
+        Trash {
+            files: files,
+            info: info,
+        }
+    }
+}
 #[cfg(test)]
 mod test {
     use super::*;
