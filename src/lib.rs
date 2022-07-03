@@ -30,7 +30,7 @@ use fs_extra::dir::move_dir;
 use fs_extra::file::move_file;
 use fs_extra::file::CopyOptions as FileCopyOptions;
 use fs_extra::dir::CopyOptions as DirCopyOptions;
-
+use std::fs;
 
 /// Returns the path to the trash directory if XDG_DATA_HOME is set.
 /// If not, returns an error.
@@ -168,6 +168,24 @@ impl Trash {
             return Ok(());
         } else {
             Err("File doesn't exists")
+        }
+    }
+
+    pub fn auto_recon_trash(&self) {
+        let mut files_path = self.path.clone();
+        files_path.push("files");
+
+        let mut info_path = self.path.clone();
+        info_path.push("info");
+
+        let mut infos:Vec<TrashInfo> = Vec::new();
+        for info_file in fs::read_dir(info_path).unwrap() {
+            infos.push(TrashInfo::from_file(info_file.unwrap()));
+        }
+
+        let mut files:Vec<String> = Vec::new();
+        for file in fs::read_dir(files_path).unwrap() {
+            files.push(file.unwrap().file_name().to_str().unwrap().to_string());
         }
     }
 }
