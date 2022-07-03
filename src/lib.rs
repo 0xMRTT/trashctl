@@ -97,12 +97,12 @@ pub fn volume_trash_dir_2(volume: PathBuf, uid: u32) -> PathBuf {
 /// Path=/home/user/test-need-to-go-to-trash-lol.md
 /// DeletionDate=2022-06-28T09:40:03
 /// ```
-struct TrashInfo {
-    path: PathBuf,
-    deletion_date: DateTime<Utc>,
+pub struct TrashInfo {
+    pub path: PathBuf,
+    pub deletion_date: DateTime<Utc>,
 }
 
-impl TrashInfo {
+ impl TrashInfo {
     /// Parse a date with the format `YYYY-MM-DDTHH:MM:SS`
     pub fn parse_date(date: String) -> Result<DateTime<Utc>, ()> {
         let date = Utc.datetime_from_str(&date, "%Y-%m-%dT%H:%M:%S");
@@ -129,14 +129,14 @@ impl TrashInfo {
     }
 }
 
-struct Trash {
-    files: Vec<String>,
-    info: Vec<TrashInfo>,
-    path: PathBuf,
+pub struct Trash {
+    pub files: Vec<String>,
+    pub info: Vec<TrashInfo>,
+    pub path: PathBuf,
 }
 
 impl Trash {
-    fn new(files: Vec<String>, info: Vec<TrashInfo>, path:PathBuf) -> Trash {
+    pub fn new(files: Vec<String>, info: Vec<TrashInfo>, path:PathBuf) -> Trash {
         Trash {
             files: files,
             info: info,
@@ -144,7 +144,7 @@ impl Trash {
         }
     }
 
-    fn add(&self, file:PathBuf) -> Result<(), &str> {
+    pub fn add(&self, file:PathBuf) -> Result<(), &str> {
         if file.exists() {
             let mut to = self.path.clone();
             to.push(file.file_name().unwrap().to_str().unwrap().to_string());
