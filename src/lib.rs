@@ -136,11 +136,19 @@ pub struct Trash {
 }
 
 impl Trash {
-    pub fn new(files: Vec<String>, info: Vec<TrashInfo>, path:PathBuf) -> Trash {
+    pub fn from(files: Vec<String>, info: Vec<TrashInfo>, path:PathBuf) -> Trash {
         Trash {
             files: files,
             info: info,
             path: path
+        }
+    }
+
+    pub fn new(path:PathBuf) -> Trash {
+        Trash {
+            files: Vec::new(),
+            info: Vec::new(),
+            path:path
         }
     }
 
