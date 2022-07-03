@@ -27,6 +27,10 @@ use std::env;
 use std::path::PathBuf;
 extern crate fs_extra;
 use fs_extra::dir::move_dir;
+use fs_extra::file::move_file;
+use fs_extra::file::CopyOptions as FileCopyOptions;
+use fs_extra::dir::CopyOptions as DirCopyOptions;
+
 
 /// Returns the path to the trash directory if XDG_DATA_HOME is set.
 /// If not, returns an error.
@@ -128,13 +132,33 @@ impl TrashInfo {
 struct Trash {
     files: Vec<String>,
     info: Vec<TrashInfo>,
+    path: PathBuf,
 }
 
 impl Trash {
-    fn new(files: Vec<String>, info: Vec<TrashInfo>) -> Trash {
+    fn new(files: Vec<String>, info: Vec<TrashInfo>, path:PathBuf) -> Trash {
         Trash {
             files: files,
             info: info,
+            path: path
+        }
+    }
+
+    fn add(&self, file:PathBuf) -> Result<(), &str> {
+        if file.exists() {
+            let mut to = self.path.clone();
+            to.push(file.file_name().unwrap().to_str().unwrap().to_string());
+            println!("TO : {:?}", to);
+            if file.is_dir() {
+                let options = DirCopyOptions::new(); //Initialize default values for CopyOptions
+                move_dir(file, to, &options).unwrap();
+            } else if file.is_file() {
+                let options = FileCopyOptions::new();
+                move_file(file, to, &options).unwrap();
+            }
+            return Ok(());
+        } else {
+            Err("File doesn't exists")
         }
     }
 }
