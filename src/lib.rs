@@ -155,6 +155,7 @@ impl Trash {
     pub fn add(&self, file:PathBuf) -> Result<(), &str> {
         if file.exists() {
             let mut to = self.path.clone();
+            to.push("files"); // Trash/files/<filename>
             to.push(file.file_name().unwrap().to_str().unwrap().to_string());
             println!("TO : {:?}", to);
             if file.is_dir() {
