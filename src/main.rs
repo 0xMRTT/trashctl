@@ -37,8 +37,6 @@ https://github.com/0xMRTT/trashctl")
                 .about("Generate shell completions for your shell to stdout")
                 .arg(
                     Arg::new("shell")
-                        .takes_value(true)
-                        .value_parser(clap::builder::EnumValueParser::<Shell>::new())
                         .help("the shell to generate completions for")
                         .value_name("SHELL")
                         .required(true),
@@ -60,14 +58,25 @@ fn main() {
         Some(("restore", sub_matches)) => cmd::restore::execute(sub_matches),
         Some(("rm", sub_matches)) => cmd::rm::execute(sub_matches),
         Some(("completions", sub_matches)) => (|| {
-            let shell: Shell = sub_matches
+            let shell_arg = sub_matches
                 .value_of("shell")
-                .ok_or_else(|| anyhow!("Shell name missing.")).unwrap()
-                .parse()
-                .map_err(|s| anyhow!("Invalid shell: {}", s)).unwrap();
+                .ok_or_else(|| anyhow!("Shell name missing."))
+                .unwrap().to_lowercase();
+
+            let mut shell: Shell = Shell::Bash;
+
+            match shell_arg.as_str() {
+                "bash" => shell=Shell::Bash,
+                "elvish" => shell=Shell::Elvish,
+                "fish" => shell=Shell::Fish,
+                "powershell" => shell=Shell::PowerShell,
+                "zsh" => shell=Shell::Zsh,
+                &_ => {error!("Shell does not exists")}
+            }
+            
 
             let mut complete_app = create_clap_app();
-            info!("Generating completions for {}", shell);
+            info!("Generating completions for {:?}", shell.clone());
             clap_complete::generate(
                 shell,
                 &mut complete_app,
