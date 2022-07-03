@@ -5,6 +5,7 @@ use env_logger;
 use anyhow::anyhow;
 mod cmd;
 pub mod lib;
+use log::{debug, error, info};
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
@@ -51,6 +52,7 @@ https://github.com/0xMRTT/trashctl")
 fn main() {
     let app = create_clap_app();
     env_logger::init();
+    info!("Successfuly initialized logger");
     let res = match app.get_matches().subcommand() {
         Some(("empty", sub_matches)) => cmd::empty::execute(sub_matches),
         Some(("list", sub_matches)) => cmd::list::execute(sub_matches),
@@ -65,6 +67,7 @@ fn main() {
                 .map_err(|s| anyhow!("Invalid shell: {}", s)).unwrap();
 
             let mut complete_app = create_clap_app();
+            info!("Generating completions for {}", shell);
             clap_complete::generate(
                 shell,
                 &mut complete_app,
@@ -77,7 +80,8 @@ fn main() {
     };
 
     if let Err(e) = res {
-        eprintln!("{:?}", e);
+        eprintln!("{:?}", e.clone());
+        error!("{:?}", e);
         std::process::exit(101);
     }
 }
