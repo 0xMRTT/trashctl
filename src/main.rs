@@ -1,7 +1,7 @@
 
 use clap::{AppSettings,App, Arg};
 use clap_complete::Shell;
-
+use env_logger;
 use anyhow::anyhow;
 mod cmd;
 pub mod lib;
@@ -50,6 +50,7 @@ https://github.com/0xMRTT/trashctl")
 
 fn main() {
     let app = create_clap_app();
+    env_logger::init();
     let res = match app.get_matches().subcommand() {
         Some(("empty", sub_matches)) => cmd::empty::execute(sub_matches),
         Some(("list", sub_matches)) => cmd::list::execute(sub_matches),
