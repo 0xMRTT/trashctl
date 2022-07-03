@@ -180,7 +180,7 @@ impl Trash {
 
         let mut infos:Vec<TrashInfo> = Vec::new();
         for info_file in fs::read_dir(info_path).unwrap() {
-            infos.push(TrashInfo::from_file(info_file.unwrap()));
+            //infos.push(TrashInfo::from_file(info_file.unwrap()));
         }
 
         let mut files:Vec<String> = Vec::new();
