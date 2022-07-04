@@ -97,6 +97,7 @@ pub fn volume_trash_dir_2(volume: PathBuf, uid: u32) -> PathBuf {
 /// Path=/home/user/test-need-to-go-to-trash-lol.md
 /// DeletionDate=2022-06-28T09:40:03
 /// ```
+#[derive(Debug)]
 pub struct TrashInfo {
     pub path: PathBuf,
     pub deletion_date: DateTime<Utc>,
@@ -129,6 +130,7 @@ pub struct TrashInfo {
     }
 }
 
+#[derive(Debug)]
 pub struct Trash {
     pub files: Vec<String>,
     pub info: Vec<TrashInfo>,
