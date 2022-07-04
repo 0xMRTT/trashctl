@@ -31,6 +31,7 @@ use fs_extra::file::move_file;
 use fs_extra::file::CopyOptions as FileCopyOptions;
 use fs_extra::dir::CopyOptions as DirCopyOptions;
 use std::fs;
+use configparser::ini::Ini;
 
 /// Returns the path to the trash directory if XDG_DATA_HOME is set.
 /// If not, returns an error.
@@ -128,6 +129,18 @@ pub struct TrashInfo {
             deletion_date,
         }
     }
+
+    pub fn from_file(file:PathBuf) -> TrashInfo {
+        let mut config = Ini::new();
+        let map = config.load(file).unwrap();
+        println!("{:?}", map);
+
+        let path = PathBuf::from(config.get("Trash Info", "Path").unwrap());
+        let deletion_date = TrashInfo::parse_date(config.get("Trash Info", "DeletionDate").unwrap()).unwrap();
+
+        TrashInfo { path: path, deletion_date: deletion_date }
+        
+    }
 }
 
 #[derive(Debug)]
@@ -182,7 +195,7 @@ impl Trash {
 
         let mut infos:Vec<TrashInfo> = Vec::new();
         for info_file in fs::read_dir(info_path).unwrap() {
-            //infos.push(TrashInfo::from_file(info_file.unwrap()));
+            infos.push(TrashInfo::from_file(info_file.unwrap().path()));
         }
 
         let mut files:Vec<String> = Vec::new();
