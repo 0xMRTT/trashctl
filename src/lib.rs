@@ -166,6 +166,23 @@ pub struct TrashInfo {
     }
 }
 
+/// Represent a Trash. A  Trash is a folder with 3 sub folders : 
+/// - `expunged`
+/// - `files` where deleted files are stored
+/// - `info` where `.trashinfo` files are stored. See `TrashInfo`
+/// 
+/// In the representation of an *nix trash in rust, there is an vector with a list of files in `files`. There is an attribute called
+/// `info` which contains a vector of `TrashInfo` objects. And in the last attribute, there is the `path` to the trash. 
+/// 
+/// ## Usage
+/// 
+/// ### With an existing trash
+/// 
+/// If the trash already exists, create a `Trash` object using the `auto_recon` or manually using `from`.
+/// 
+/// ```
+/// let trash = Trash::auto_recon(PathBuf::from("/home/user/.local/share/Trash"));
+/// ```
 #[derive(Debug)]
 pub struct Trash {
     pub files: Vec<String>,
