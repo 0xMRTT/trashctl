@@ -218,7 +218,7 @@ impl Trash {
         }
     }
 
-    pub fn auto_recon_trash(path:PathBuf) -> Trash {
+    pub fn auto_recon(path:PathBuf) -> Trash {
         let mut files_path = path.clone();
         files_path.push("files");
 
