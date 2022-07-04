@@ -182,14 +182,6 @@ impl Trash {
         }
     }
 
-    pub fn new(path:PathBuf) -> Trash {
-        Trash {
-            files: Vec::new(),
-            info: Vec::new(),
-            path:path
-        }
-    }
-
     pub fn add(&self, file:PathBuf) -> Result<(), &str> {
         if file.exists() {
             let mut to = self.path.clone();
