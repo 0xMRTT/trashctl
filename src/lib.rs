@@ -173,11 +173,11 @@ impl Trash {
         }
     }
 
-    pub fn auto_recon_trash(&self) {
-        let mut files_path = self.path.clone();
+    pub fn auto_recon_trash(path:PathBuf) -> Trash {
+        let mut files_path = path.clone();
         files_path.push("files");
 
-        let mut info_path = self.path.clone();
+        let mut info_path = path.clone();
         info_path.push("info");
 
         let mut infos:Vec<TrashInfo> = Vec::new();
@@ -189,6 +189,8 @@ impl Trash {
         for file in fs::read_dir(files_path).unwrap() {
             files.push(file.unwrap().file_name().to_str().unwrap().to_string());
         }
+
+        Trash { files: files, info: infos, path:  path}
     }
 }
 #[cfg(test)]
