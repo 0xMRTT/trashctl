@@ -130,6 +130,29 @@ pub struct TrashInfo {
         }
     }
 
+    /// Create a new `TrashInfo` from a `.trashinfo` file.
+    /// `.trashinfo` files are in `Trash/info` and contains metadate about deleted files : the time when the file was deleted
+    /// and the original path.
+    /// 
+    /// ## Usage
+    /// 
+    /// `from_file` just took the `.trashinfo` path and return a fresh `TrashInfo` object.
+    /// 
+    /// ## Format
+    /// 
+    /// `.trashinfo` file must contain a section called `Trash Info` with to keys : 
+    /// - `Path`
+    /// - `DeletionDate`
+    /// 
+    /// ### Example
+    /// 
+    /// If the original path is `/home/user/test` and the time is 2022/07/05 at 00:00:00. 
+    /// 
+    /// ``` ini
+    /// [Trash Info]
+    /// Path=/home/user/test
+    /// DeletionDate=2022-07-05T00:00:00
+    /// ```
     pub fn from_file(file:PathBuf) -> TrashInfo {
         let mut config = Ini::new();
         let map = config.load(file).unwrap();
