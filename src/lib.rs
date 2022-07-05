@@ -181,6 +181,8 @@ pub struct TrashInfo {
 /// If the trash already exists, create a `Trash` object using the `auto_recon` or manually using `from`.
 /// 
 /// ```
+/// use trashctl::Trash;
+/// use std::path::PathBuf;
 /// let trash = Trash::auto_recon(PathBuf::from("/home/user/.local/share/Trash"));
 /// ```
 #[derive(Debug)]
