@@ -6,6 +6,7 @@ use anyhow::anyhow;
 mod cmd;
 pub mod lib;
 use log::{debug, error, info};
+use std::path::PathBuf;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
@@ -51,7 +52,11 @@ fn main() {
     let app = create_clap_app();
     env_logger::init();
     info!("Successfuly initialized logger");
-    let res = match app.get_matches().subcommand() {
+    use crate::lib::Trash;
+    use crate::lib::home_trash_dir_path;
+    let trash = Trash::auto_recon(home_trash_dir_path());
+    println!("{:?} - \n {:?} - \n {:?}", trash.files, trash.info, trash.path);
+    /*let res = match app.get_matches().subcommand() {
         Some(("empty", sub_matches)) => cmd::empty::execute(sub_matches),
         Some(("list", sub_matches)) => cmd::list::execute(sub_matches),
         Some(("put", sub_matches)) => cmd::put::execute(sub_matches),
@@ -93,4 +98,5 @@ fn main() {
         error!("{:?}", e);
         std::process::exit(101);
     }
+     */
 }
