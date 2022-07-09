@@ -52,8 +52,6 @@ fn main() {
     let app = create_clap_app();
     env_logger::init();
     info!("Successfuly initialized logger");
-    use crate::lib::Trash;
-    use crate::lib::home_trash_dir_path;
     let res = match app.get_matches().subcommand() {
         Some(("empty", sub_matches)) => cmd::empty::execute(sub_matches),
         Some(("list", sub_matches)) => cmd::list::execute(sub_matches),
