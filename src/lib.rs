@@ -27,7 +27,9 @@ use std::env;
 use std::path::PathBuf;
 extern crate fs_extra;
 use fs_extra::dir::move_dir;
+use fs_extra::dir::remove as remove_dir;
 use fs_extra::file::move_file;
+use fs_extra::file::remove as remove_file;
 use fs_extra::file::CopyOptions as FileCopyOptions;
 use fs_extra::dir::CopyOptions as DirCopyOptions;
 use std::fs;
@@ -238,6 +240,28 @@ impl Trash {
         }
 
         Trash { files: files, info: infos, path:  path}
+    }
+
+    pub fn empty(&mut self) -> Result<(), std::io::Error> {
+        let mut files_path = self.path.clone();
+        files_path.push("files");
+
+        let mut info_path = self.path.clone();
+        info_path.push("info");
+
+        for info_file in fs::read_dir(info_path).unwrap() {
+            fs::remove_file(info_file.unwrap().path())?;
+        }
+
+        for file in fs::read_dir(files_path).unwrap() {
+            let path = file.unwrap().path();
+            if path.is_dir() {
+                remove_dir(path).unwrap();
+            } else {
+                remove_file(path).unwrap();
+            }
+        }
+        Ok(())
     }
 }
 #[cfg(test)]
