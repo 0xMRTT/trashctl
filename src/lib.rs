@@ -24,6 +24,7 @@ use chrono::prelude::*;
 use dirs::data_local_dir;
 use dirs::home_dir;
 use std::env;
+use std::hash::Hash;
 use std::path::PathBuf;
 extern crate fs_extra;
 use fs_extra::dir::move_dir;
@@ -34,6 +35,7 @@ use fs_extra::file::CopyOptions as FileCopyOptions;
 use fs_extra::dir::CopyOptions as DirCopyOptions;
 use std::fs;
 use configparser::ini::Ini;
+use std::collections::HashMap;
 
 /// Returns the path to the trash directory if XDG_DATA_HOME is set.
 /// If not, returns an error.
@@ -189,13 +191,13 @@ pub struct TrashInfo {
 /// ```
 #[derive(Debug)]
 pub struct Trash {
-    pub files: Vec<String>,
-    pub info: Vec<TrashInfo>,
+    pub files: HashMap<String, String>,
+    pub info: HashMap<String, TrashInfo>,
     pub path: PathBuf,
 }
 
 impl Trash {
-    pub fn from(files: Vec<String>, info: Vec<TrashInfo>, path:PathBuf) -> Trash {
+    pub fn from(files: HashMap<String, String>, info: HashMap<String, TrashInfo>, path:PathBuf) -> Trash {
         Trash {
             files: files,
             info: info,
@@ -229,14 +231,16 @@ impl Trash {
         let mut info_path = path.clone();
         info_path.push("info");
 
-        let mut infos:Vec<TrashInfo> = Vec::new();
+        let mut infos:HashMap<String, TrashInfo> = HashMap::new();
         for info_file in fs::read_dir(info_path).unwrap() {
-            infos.push(TrashInfo::from_file(info_file.unwrap().path()));
+            let info_file = info_file.unwrap();
+            infos.insert(info_file.file_name().to_str().unwrap().to_string(), TrashInfo::from_file(info_file.path()));
         }
 
-        let mut files:Vec<String> = Vec::new();
+        let mut files:HashMap<String, String> = HashMap::new();
         for file in fs::read_dir(files_path).unwrap() {
-            files.push(file.unwrap().file_name().to_str().unwrap().to_string());
+            let file = file.unwrap();
+            files.insert(file.file_name().to_str().unwrap().to_string(), file.path().to_str().unwrap().to_string());
         }
 
         Trash { files: files, info: infos, path:  path}
@@ -260,6 +264,13 @@ impl Trash {
             } else {
                 remove_file(path).unwrap();
             }
+        }
+        Ok(())
+    }
+
+    pub fn rm(&mut self, to_delete:Vec<PathBuf>) -> Result<(), ()> {
+        for f in to_delete {
+            
         }
         Ok(())
     }
