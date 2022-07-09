@@ -268,9 +268,20 @@ impl Trash {
         Ok(())
     }
 
-    pub fn rm(&mut self, to_delete:Vec<PathBuf>) -> Result<(), ()> {
+    pub fn rm(&mut self, to_delete:Vec<PathBuf>) -> Result<(), &str> {
         for f in to_delete {
-            
+            let mut path_in_trash = self.path.clone();
+            path_in_trash.push(f);
+
+            if path_in_trash.exists() {
+                if path_in_trash.is_dir() {
+                    remove_dir(path_in_trash).unwrap();
+                } else {
+                    remove_file(path_in_trash).unwrap();
+                }
+            } else {
+                return Err("File not found")
+            }
         }
         Ok(())
     }
