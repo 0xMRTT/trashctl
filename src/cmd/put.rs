@@ -18,7 +18,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), ()> {
     let mut files = args.values_of("path").unwrap();
    
 
-    let mut trash = Trash::new( trash_path);
+    let mut trash = Trash::auto_recon( trash_path);
     
     
     for file in files {

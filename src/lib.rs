@@ -24,14 +24,18 @@ use chrono::prelude::*;
 use dirs::data_local_dir;
 use dirs::home_dir;
 use std::env;
+use std::hash::Hash;
 use std::path::PathBuf;
 extern crate fs_extra;
 use fs_extra::dir::move_dir;
+use fs_extra::dir::remove as remove_dir;
 use fs_extra::file::move_file;
+use fs_extra::file::remove as remove_file;
 use fs_extra::file::CopyOptions as FileCopyOptions;
 use fs_extra::dir::CopyOptions as DirCopyOptions;
 use std::fs;
 use configparser::ini::Ini;
+use std::collections::HashMap;
 
 /// Returns the path to the trash directory if XDG_DATA_HOME is set.
 /// If not, returns an error.
@@ -181,17 +185,19 @@ pub struct TrashInfo {
 /// If the trash already exists, create a `Trash` object using the `auto_recon` or manually using `from`.
 /// 
 /// ```
+/// use trashctl::Trash;
+/// use std::path::PathBuf;
 /// let trash = Trash::auto_recon(PathBuf::from("/home/user/.local/share/Trash"));
 /// ```
 #[derive(Debug)]
 pub struct Trash {
-    pub files: Vec<String>,
-    pub info: Vec<TrashInfo>,
+    pub files: HashMap<String, String>,
+    pub info: HashMap<String, TrashInfo>,
     pub path: PathBuf,
 }
 
 impl Trash {
-    pub fn from(files: Vec<String>, info: Vec<TrashInfo>, path:PathBuf) -> Trash {
+    pub fn from(files: HashMap<String, String>, info: HashMap<String, TrashInfo>, path:PathBuf) -> Trash {
         Trash {
             files: files,
             info: info,
@@ -225,17 +231,59 @@ impl Trash {
         let mut info_path = path.clone();
         info_path.push("info");
 
-        let mut infos:Vec<TrashInfo> = Vec::new();
+        let mut infos:HashMap<String, TrashInfo> = HashMap::new();
         for info_file in fs::read_dir(info_path).unwrap() {
-            infos.push(TrashInfo::from_file(info_file.unwrap().path()));
+            let info_file = info_file.unwrap();
+            infos.insert(info_file.file_name().to_str().unwrap().to_string(), TrashInfo::from_file(info_file.path()));
         }
 
-        let mut files:Vec<String> = Vec::new();
+        let mut files:HashMap<String, String> = HashMap::new();
         for file in fs::read_dir(files_path).unwrap() {
-            files.push(file.unwrap().file_name().to_str().unwrap().to_string());
+            let file = file.unwrap();
+            files.insert(file.file_name().to_str().unwrap().to_string(), file.path().to_str().unwrap().to_string());
         }
 
         Trash { files: files, info: infos, path:  path}
+    }
+
+    pub fn empty(&mut self) -> Result<(), std::io::Error> {
+        let mut files_path = self.path.clone();
+        files_path.push("files");
+
+        let mut info_path = self.path.clone();
+        info_path.push("info");
+
+        for info_file in fs::read_dir(info_path).unwrap() {
+            fs::remove_file(info_file.unwrap().path())?;
+        }
+
+        for file in fs::read_dir(files_path).unwrap() {
+            let path = file.unwrap().path();
+            if path.is_dir() {
+                remove_dir(path).unwrap();
+            } else {
+                remove_file(path).unwrap();
+            }
+        }
+        Ok(())
+    }
+
+    pub fn rm(&mut self, to_delete:Vec<PathBuf>) -> Result<(), &str> {
+        for f in to_delete {
+            let mut path_in_trash = self.path.clone();
+            path_in_trash.push(f);
+
+            if path_in_trash.exists() {
+                if path_in_trash.is_dir() {
+                    remove_dir(path_in_trash).unwrap();
+                } else {
+                    remove_file(path_in_trash).unwrap();
+                }
+            } else {
+                return Err("File not found")
+            }
+        }
+        Ok(())
     }
 }
 #[cfg(test)]
